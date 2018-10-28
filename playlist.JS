@@ -11,7 +11,7 @@ b.setAttribute('data-platform', navigator.platform );
 
 // HTML5 audio player + playlist controls...
 // Inspiration: http://jonhall.info/how_to/create_a_playlist_for_html5_audio
-// Mythium Archive: https://archive.org/details/mythium/
+// Mythium Archive: https://archive.org/download/jam3_34/jam3_34_archive.torrent/
 jQuery(function ($) {
     var supportsAudio = !! document.createElement('audio').canPlayType;
     if (supportsAudio) {
