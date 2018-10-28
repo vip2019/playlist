@@ -1,424 +1,270 @@
-// YOUTUBE API 
-//https://stackoverflow.com/questions/43839217/how-do-i-retrieve-my-youtube-channel-playlists
-// BY CHANNEL
-//https://content.googleapis.com/youtube/v3/channels?id=UC_x5XG1OV2P6uZZ5FSM9Ttw&part=snippet%2CcontentDetails%2Cstatistics&key=12345
-// FOR USERNAME
-//https://content.googleapis.com/youtube/v3/channels?forUsername=ginocote&part=snippet%2CcontentDetails%2Cstatistics&key=12345
-// THEN GET BY UPLOAD ID AND LOAD API playlistItems 
-
-// BY CHANNEL ID GET ALL
-//https://content.googleapis.com/youtube/v3/playlists?channelId=UC-VKI9vpl2tSyv0FK9E1-KA&maxResults=50&part=snippet&key=12345
-
-var addbuttons = true ;
-
-var players = plyr.setup(".js-player");
-
-/* PLAYLIST  */
-var myPlaylist = [
-  {
-    type: "youtube",
-    title: "Charlie Puth - Attention [Official Video]",
-    author: "Charlie Puth",
-    sources: [{ 
-      src: "nfs8NYg7yQM", 
-      type: "youtube"
-    }],
-    src: "nfs8NYg7yQM",
-    poster: "https://img.youtube.com/vi/nfs8NYg7yQM/hqdefault.jpg"
-  },
-  {
-    type: "youtube",
-    title: "Armin van Buuren live at Ultra Music Festival Miami 2017",
-    author: "Armin van Buuren",
-    sources: [{ 
-      src: "cLcKew4cQq4", 
-      type: "youtube"
-    }],
-    poster: "https://img.youtube.com/vi/cLcKew4cQq4/hqdefault.jpg"
-  },
-  {
-    type: "youtube",
-    title: "2 hours Trance Music - Armin Van Buuren",
-    author: "Armin van Buuren",
-    sources: [{ 
-      src: "https://www.youtube.com/watch?v=r6KXy0j85AM", 
-      type: "youtube"
-    }],
-    poster: "https://img.youtube.com/vi/r6KXy0j85AM/hqdefault.jpg"
-  },
-  {
-    type: "audio",
-    title: "Clublife by Tiësto 542 podcast ",
-    author: "Tiësto",
-    sources: [{ 
-      src: "http://feed.pippa.io/public/streams/593eded1acfa040562f3480b/episodes/59c0c870ed6a93163c0a193d.m4a", 
-      type: "m4v"
-    }],
-    poster: "https://img.youtube.com/vi/r6KXy0j85AM/hqdefault.jpg"
-  },
-  {
-    type: "audio",
-    title: "Vocal Trance Vol 261",
-    author: "Sonnydeejay",
-    sources: [{ 
-      src: "http://archive.org/download/SonnydeejayVocalTranceVol261/Sonnydeejay%20-Vocal%20Trance%20vol%20261.mp3", 
-      type: "mp3"
-    }],
-    poster: "http://4.bp.blogspot.com/-d6IPBUIj6YE/ThpRaIGJXtI/AAAAAAAABQ8/54RNlCrKCv4/s1600/podcast.jpg"
-  },
-  {
-    type: "youtube",
-    title: "2 hours Trance Music - Armin Van Buuren",
-    author: "Armin van Buuren",
-    sources: [{ 
-      src: "https://www.youtube.com/watch?v=r6KXy0j85AM", 
-      type: "youtube"
-    }],
-    poster: "https://img.youtube.com/vi/r6KXy0j85AM/hqdefault.jpg"
-  },
-  {
-    type: "youtube",
-    title: "2 hours Trance Music - Armin Van Buuren",
-    author: "Armin van Buuren",
-    sources: [{ 
-      src: "https://www.youtube.com/watch?v=r6KXy0j85AM", 
-      type: "youtube"
-    }],
-    poster: "https://img.youtube.com/vi/r6KXy0j85AM/hqdefault.jpg"
-  },
-  {
-    type: "youtube",
-    title: "2 hours Trance Music - Armin Van Buuren",
-    author: "Armin van Buuren",
-    sources: [{ 
-      src: "https://www.youtube.com/watch?v=r6KXy0j85AM", 
-      type: "youtube"
-    }],
-    poster: "https://img.youtube.com/vi/r6KXy0j85AM/hqdefault.jpg"
-  },
-  {
-    type: "youtube",
-    title: "2 hours Trance Music - Armin Van Buuren",
-    author: "Armin van Buuren",
-    sources: [{ 
-      src: "https://www.youtube.com/watch?v=r6KXy0j85AM", 
-      type: "youtube"
-    }],
-    poster: "https://img.youtube.com/vi/r6KXy0j85AM/hqdefault.jpg"
-  },
-  {
-    type: "youtube",
-    title: "2 hours Trance Music - Armin Van Buuren",
-    author: "Armin van Buuren",
-    sources: [{ 
-      src: "https://www.youtube.com/watch?v=r6KXy0j85AM", 
-      type: "youtube"
-    }],
-    poster: "https://img.youtube.com/vi/r6KXy0j85AM/hqdefault.jpg"
-  },
-  {
-    type: "youtube",
-    title: "2 hours Trance Music - Armin Van Buuren",
-    author: "Armin van Buuren",
-    sources: [{ 
-      src: "https://www.youtube.com/watch?v=r6KXy0j85AM", 
-      type: "youtube"
-    }],
-    poster: "https://img.youtube.com/vi/r6KXy0j85AM/hqdefault.jpg"
-  },
-  {
-    type: "youtube",
-    title: "2 hours Trance Music - Armin Van Buuren",
-    author: "Armin van Buuren",
-    sources: [{ 
-      src: "https://www.youtube.com/watch?v=r6KXy0j85AM", 
-      type: "youtube"
-    }],
-    poster: "https://img.youtube.com/vi/r6KXy0j85AM/hqdefault.jpg"
-  }
-];
-
-/****************************************************************************************/
-//var myPlaylist = ""; // Load json playlist OR Youtube api 3 Playlist
-/****************************************************************************************/
-
-// setTimeout(function(){
-
-//   //$("li.pls-playing").removeClass("pls-playing");
-//   //$(".plyr-playlist-wrapper").remove();
-
-//   var target = ".js-player";
-//   //var limit = 50;
-//   var apikey = "AIzaSyDDBk8tAkod1VRRNyFZF09fgQyMpnSe5HI";
-
-//   loadPlaylist(target, apikey, 10, myPlaylist); 
-  
-// }, 5000);
-//   // scrollTo BUG
+// html5media enables <video> and <audio> tags in all major browsers
+// External File: https://api.html5media.info/1.1.8/html5media.min.js
 
 
-var apikey = "AIzaSyDDBk8tAkod1VRRNyFZF09fgQyMpnSe5HI";
-//var apikey = ""; // ONLY FOR MY CUSTOM PLAYLIST NO NEED FOR YOUTUBE API KEY
-var target = ".js-player";
-var limit = 30;
+// Add user agent as an attribute on the <html> tag...
+// Inspiration: https://css-tricks.com/ie-10-specific-styles/
+var b = document.documentElement;
+b.setAttribute('data-useragent',  navigator.userAgent);
+b.setAttribute('data-platform', navigator.platform );
 
-$(document).ready(function(){
-  // loadPlaylist(target, apikey, limit = 20, myPlaylist); // LOAD JSON PLAYLIST
-  loadPlaylist(target, apikey, limit, myPlaylist);  // LOAD YOUTUBE OR USER VIDEO LIST
-  
-}); // JQUERY READY END
 
-function loadPlaylist(target, apikey, limit = 20, myPlaylist) {
-  
-  $("li.pls-playing").removeClass("pls-playing");
-  $(".plyr-playlist-wrapper").remove();
-  
-  
-  limit = limit-1;
-  
-  // GET YOUTUBE PLAYLIST
-  //var getPlaylist = $("div[data-type='youtube']").eq(0).data("playlist");
-  //var getPlaylist = $("[data-type='youtube']").data("playlist");
-  //var getPlaylist = $(".js-player").eq(0).data("playlist");
-  
-  if (myPlaylist) {
-
-    PlyrPlaylist(".plyr-playlist", myPlaylist, limit);
-    //return 
-  } else{
-    
-    var ytplaylist = $(target).attr("data-ytpls");
-    var ytuser = $(target).attr("data-user");
-
-    //if ($('.js-player[data-ytpls]').length > 0){
-    if (ytplaylist) {
-      getTYPlaylist(ytplaylist, apikey, limit)
-      //alert(ytplaylist);
-    } else if (ytuser) {
-      alert(ytuser);
-    }
-    
-  }
-    
-//typeof $getYTPls === "undefined") return;
-
-  //var getPlaylist = $(".js-player").eq(0).data("playlist");
-//   var $getData = $(".js-player").eq(0);
-
-//   var $getYTPls = $getData.data("ytpls");
-
-  //alert(getPlaylist);
-  //console.log(myPlaylist[0]);
-
-  //if (typeof $getYTPls === "undefined") return;
-
-  //var apikey = "AIzaSyB64VbCIHW48wwarovz64tcsRaZrciFkWM";
-  //
-  //var playlistId = "RDQMyFModNyxXx8";
-  //var playlistId = $getYTPls;
-
-  //"https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&id=YOUR-PLAYLIST-ID&key={YOUR_API_KEY}"
-
-function getTYPlaylist(playlistId, apikey, limit) {
-  
-  $.ajax({
-    url:
-      "https://content.googleapis.com/youtube/v3/playlistItems?&key=" +
-      apikey +
-      "&maxResults=" +
-      limit +
-      "&part=id,snippet&playlistId=" +
-      playlistId +
-      "&type=video",
-    dataType: "jsonp",
-    success: function(data) {
-      console.log(data.items);
-      //console.log(data.items[0].snippet.title);
-
-      resultData = youtubeParser(data);
-
-      console.log(resultData);
-
-      PlyrPlaylist(".plyr-playlist", resultData, limit);
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      alert(textStatus, +" | " + errorThrown);
-    }
-  });
-  
-}
-
-  //PlyrPlaylist(".plyr-playlist", myPlaylist);
-
-  function PlyrPlaylist(target, myPlaylist, limit) {
-    $('<div class="plyr-playlist-wrapper"><ul class="plyr-playlist"></ul></div>').insertAfter("#player");
-
-    var startwith = 0; // Maybe a playlist option to start with choosen video
-
-    var playingclass = "";
-    var items = [];
-    //var playing == 1 ;
-    $.each(myPlaylist, function(id, val) {
-      //items.push('<li>' + option.title + '</li>');
-      //alert(id)
-
-      //console.log(val);
-
-      if (0 === id) playingclass = "pls-playing";
-      else playingclass = "";
-
-      items.push(
-        '<li class="' +playingclass +'"><a href="#" data-type="' +val.sources[0].type +'" data-video-id="' +val.sources[0].src +'"><img class="plyr-miniposter" src="' + val.poster + '"> ' +
-val.title +" - " +val.author +"</a></li> ");
-      
-      if (id == limit) 
-        return false;
-      
-    });
-    $(target).html(items.join(""));
-    
-    setTimeout(function(){ 
-      //$(target+" .pls-playing").find("a").trigger("click");
-      
-    }, 500);
-    
-    // players[0].on("isReady", function(event) {
-    //   alert("isReady")
-    //   $(target+" .pls-playing").find("a").trigger("click");
-    // });
-    
-  // players[0].on("ready", function(event) {
-  //   //$(".plyr-playlist .pls-playing").find("a").one().trigger("click");
-  //   //players[0].play();
-  //   $(target+" .pls-playing").find("a").trigger("click");
-  // });
-
-    // hack, play the first video in the playlist
-    // setTimeout(function(){ 
-    //       $(target).find("a").trigger("click");
-    // }, 500);
-
-    //   var getObj = myPlaylist[startwith];
-
-    //   var video_id = getObj.youtube;
-    //   var video_title = getObj.title;
-
-    //   alert(video_id)
-
-    //   console.log(video_id);
-
-    //   //console.log(myPlaylist[0]);
-
-    //   players[0].source({
-    //     type: "video",
-    //     title: "video_title",
-    //     sources: [{ src: "cLcKew4cQq4", type: "youtube" }]
-    //   });
-
-    //console.log(items[0]);
-     // hack, play the first video in the playlist
-    //$(".plyr-playlist .pls-playing").find("a").trigger("click");
-    //$(target).find("pls-playing a").trigger("click");
-    // setTimeout(function(){ 
-    //       $(".plyr-playlist .pls-playing").find("a").trigger("click");
-    // }, 500);
-
-  $(document).on("click", "ul.plyr-playlist li a", function(event) {
-    //$("ul.plyr-playlist li a").on("click", function(event) {
-    event.preventDefault();
-
-    $("li.pls-playing").removeClass("pls-playing");
-    $(this)
-      .parent()
-      .addClass("pls-playing");
-
-    var video_id = $(this).data("video-id");
-    var video_type = $(this).data("type");
-    var video_title = $(this).text();
-
-    //alert(video_id);
-
-    players[0].source({
-      type: "video",
-      title: "video_title",
-      sources: [{ src: video_id, type: video_type }]
-    });
-
-    //ScrollTo($(".pls-playing").attr("href"), 500,0,10);
-
-    $(".plyr-playlist").scrollTo(".pls-playing", 300);
-
-    // players[0].on("ended", function(event) {
-    //   console.log("test");
-    // });
-  })
-  .on("click", ".plyr-prev", function(event) {
-    var $next = $(".plyr-playlist .pls-playing")
-      .prev()
-      .find("a")
-      .trigger("click");
-  })
-  .on("click", ".plyr-next", function(event) {
-    var $next = $(".plyr-playlist .pls-playing")
-      .next()
-      .find("a")
-      .trigger("click");
-  });
-
-  ///////////////////////
-
-  // GET YOUTUBE PLAYLIST
-  /* YOUTUBE PLAYLIST PARSER */
-  // http://jsfiddle.net/onigetoc/cb2u1y4k/
-  function youtubeParser(data) {
-    var new_Data = data.items.map(function(item) {
-      var thumb;
-
-      if (item.snippet.thumbnails) {
-        if (item.snippet.thumbnails.default)
-          //live?
-          thumb = item.snippet.thumbnails.default.url;
-
-        if (item.snippet.thumbnails.medium)
-          //live?
-          thumb = item.snippet.thumbnails.default.url;
-      }
-
-      return {
-        //type: "youtube",
-        title: item.snippet.title,
-        description: item.snippet.description,
-        author: item.snippet.channelTitle,
-        sources: [{ 
-          src: item.snippet.resourceId.videoId, 
-          type: item.kind.split('#')[0] 
+// HTML5 audio player + playlist controls...
+// Inspiration: http://jonhall.info/how_to/create_a_playlist_for_html5_audio
+// Mythium Archive: https://archive.org/details/mythium/
+jQuery(function ($) {
+    var supportsAudio = !! document.createElement('audio').canPlayType;
+    if (supportsAudio) {
+        var index = 0,
+            playing = false;
+        mediaPath = 'https://archive.org/download/jam3_34',
+        extension = '',
+        tracks = [{
+            "track": 1,
+            "name": "All This Is -- Joe L.'s Studio",
+            "length": "02:46",
+            "file": "03 Do Sol vos nasce A Luz"
+        }, {
+            "track": 2,
+            "name": "The Forsaken -- Broadwing Studio (Final Mix)",
+            "length": "08:30",
+            "file": "BS_TF"
+        }, {
+            "track": 3,
+            "name": "All The King's Men -- Broadwing Studio (Final Mix)",
+            "length": "05:01",
+            "file": "BS_ATKM"
+        }, {
+            "track": 4,
+            "name": "The Forsaken -- Broadwing Studio (First Mix)",
+            "length": "08:32",
+            "file": "BSFM_TF"
+        }, {
+            "track": 5,
+            "name": "All The King's Men -- Broadwing Studio (First Mix)",
+            "length": "05:05",
+            "file": "BSFM_ATKM"
+        }, {
+            "track": 6,
+            "name": "All This Is -- Alternate Cuts",
+            "length": "02:49",
+            "file": "AC_ATI"
+        }, {
+            "track": 7,
+            "name": "All The King's Men (Take 1) -- Alternate Cuts",
+            "length": "05:44",
+            "file": "AC_ATKMTake_1"
+        }, {
+            "track": 8,
+            "name": "All The King's Men (Take 2) -- Alternate Cuts",
+            "length": "05:27",
+            "file": "AC_ATKMTake_2"
+        }, {
+            "track": 9,
+            "name": "Magus -- Alternate Cuts",
+            "length": "05:46",
+            "file": "AC_M"
+        }, {
+            "track": 10,
+            "name": "The State Of Wearing Address (fucked up) -- Alternate Cuts",
+            "length": "05:25",
+            "file": "AC_TSOWAfucked_up"
+        }, {
+            "track": 11,
+            "name": "Magus -- Popeye's (New Years '04 - '05)",
+            "length": "05:53",
+            "file": "PNY04-05_M"
+        }, {
+            "track": 12,
+            "name": "On The Waterfront -- Popeye's (New Years '04 - '05)",
+            "length": "04:41",
+            "file": "PNY04-05_OTW"
+        }, {
+            "track": 13,
+            "name": "Trance -- Popeye's (New Years '04 - '05)",
+            "length": "13:16",
+            "file": "PNY04-05_T"
+        }, {
+            "track": 14,
+            "name": "The Forsaken -- Popeye's (New Years '04 - '05)",
+            "length": "08:13",
+            "file": "PNY04-05_TF"
+        }, {
+            "track": 15,
+            "name": "The State Of Wearing Address -- Popeye's (New Years '04 - '05)",
+            "length": "07:02",
+            "file": "PNY04-05_TSOWA"
+        }, {
+            "track": 16,
+            "name": "Magus -- Popeye's (Valentine's Day '05)",
+            "length": "05:44",
+            "file": "PVD_M"
+        }, {
+            "track": 17,
+            "name": "Trance -- Popeye's (Valentine's Day '05)",
+            "length": "10:45",
+            "file": "PVD_T"
+        }, {
+            "track": 18,
+            "name": "The State Of Wearing Address -- Popeye's (Valentine's Day '05)",
+            "length": "05:36",
+            "file": "PVD_TSOWA"
+        }, {
+            "track": 19,
+            "name": "All This Is -- Smith St. Basement (01/08/04)",
+            "length": "02:49",
+            "file": "SSB01_08_04_ATI"
+        }, {
+            "track": 20,
+            "name": "Magus -- Smith St. Basement (01/08/04)",
+            "length": "05:46",
+            "file": "SSB01_08_04_M"
+        }, {
+            "track": 21,
+            "name": "Beneath The Painted Eye -- Smith St. Basement (06/06/03)",
+            "length": "13:07",
+            "file": "SSB06_06_03_BTPE"
+        }, {
+            "track": 22,
+            "name": "Innocence -- Smith St. Basement (06/06/03)",
+            "length": "05:16",
+            "file": "SSB06_06_03_I"
+        }, {
+            "track": 23,
+            "name": "Magus -- Smith St. Basement (06/06/03)",
+            "length": "05:47",
+            "file": "SSB06_06_03_M"
+        }, {
+            "track": 24,
+            "name": "Madness Explored -- Smith St. Basement (06/06/03)",
+            "length": "04:52",
+            "file": "SSB06_06_03_ME"
+        }, {
+            "track": 25,
+            "name": "The Forsaken -- Smith St. Basement (06/06/03)",
+            "length": "08:43",
+            "file": "SSB06_06_03_TF"
+        }, {
+            "track": 26,
+            "name": "All This Is -- Smith St. Basement (12/28/03)",
+            "length": "03:00",
+            "file": "SSB12_28_03_ATI"
+        }, {
+            "track": 27,
+            "name": "Magus -- Smith St. Basement (12/28/03)",
+            "length": "06:09",
+            "file": "SSB12_28_03_M"
+        }, {
+            "track": 28,
+            "name": "Madness Explored -- Smith St. Basement (12/28/03)",
+            "length": "05:06",
+            "file": "SSB12_28_03_ME"
+        }, {
+            "track": 29,
+            "name": "Trance -- Smith St. Basement (12/28/03)",
+            "length": "12:33",
+            "file": "SSB12_28_03_T"
+        }, {
+            "track": 30,
+            "name": "The Forsaken -- Smith St. Basement (12/28/03)",
+            "length": "08:57",
+            "file": "SSB12_28_03_TF"
+        }, {
+            "track": 31,
+            "name": "All This Is (Take 1) -- Smith St. Basement (Nov. '03)",
+            "length": "04:55",
+            "file": "SSB___11_03_ATITake_1"
+        }, {
+            "track": 32,
+            "name": "All This Is (Take 2) -- Smith St. Basement (Nov. '03)",
+            "length": "05:45",
+            "file": "SSB___11_03_ATITake_2"
+        }, {
+            "track": 33,
+            "name": "Beneath The Painted Eye (Take 1) -- Smith St. Basement (Nov. '03)",
+            "length": "14:05",
+            "file": "SSB___11_03_BTPETake_1"
+        }, {
+            "track": 34,
+            "name": "Beneath The Painted Eye (Take 2) -- Smith St. Basement (Nov. '03)",
+            "length": "13:26",
+            "file": "SSB___11_03_BTPETake_2"
+        }, {
+            "track": 35,
+            "name": "The Forsaken (Take 1) -- Smith St. Basement (Nov. '03)",
+            "length": "08:37",
+            "file": "SSB___11_03_TFTake_1"
+        }, {
+            "track": 36,
+            "name": "The Forsaken (Take 2) -- Smith St. Basement (Nov. '03)",
+            "length": "08:36",
+            "file": "SSB___11_03_TFTake_2"
         }],
-        poster: thumb
-      };
-    });
-
-    console.log(new_Data);
-
-    // var output = {
-    //   item: new_Data
-    // };
-
-    return new_Data;
-  }
-}
-
-/****** GC ScrollTo **********/
-// mine: https://jsfiddle.net/onigetoc/5kh0e5f4/
-// https://stackoverflow.com/questions/2346011/how-do-i-scroll-to-an-element-within-an-overflowed-div
-jQuery.fn.scrollTo = function(elem, speed, margin) {
-  jQuery(this).animate(
-    {
-      scrollTop:
-        jQuery(this).scrollTop() -
-        jQuery(this).offset().top +
-        jQuery(elem).offset().top
-    },
-    speed == undefined ? 1000 : speed
-  );
-  return this;
-};
+        trackCount = tracks.length,
+        npAction = $('#npAction'),
+        npTitle = $('#npTitle'),
+        audio = $('#audio1').bind('play', function () {
+            playing = true;
+            npAction.text('Now Playing...');
+        }).bind('pause', function () {
+            playing = false;
+            npAction.text('Paused...');
+        }).bind('ended', function () {
+            npAction.text('Paused...');
+            if ((index + 1) < trackCount) {
+                index++;
+                loadTrack(index);
+                audio.play();
+            } else {
+                audio.pause();
+                index = 0;
+                loadTrack(index);
+            }
+        }).get(0),
+        btnPrev = $('#btnPrev').click(function () {
+            if ((index - 1) > -1) {
+                index--;
+                loadTrack(index);
+                if (playing) {
+                    audio.play();
+                }
+            } else {
+                audio.pause();
+                index = 0;
+                loadTrack(index);
+            }
+        }),
+        btnNext = $('#btnNext').click(function () {
+            if ((index + 1) < trackCount) {
+                index++;
+                loadTrack(index);
+                if (playing) {
+                    audio.play();
+                }
+            } else {
+                audio.pause();
+                index = 0;
+                loadTrack(index);
+            }
+        }),
+        li = $('#plList li').click(function () {
+            var id = parseInt($(this).index());
+            if (id !== index) {
+                playTrack(id);
+            }
+        }),
+        loadTrack = function (id) {
+            $('.plSel').removeClass('plSel');
+            $('#plList li:eq(' + id + ')').addClass('plSel');
+            npTitle.text(tracks[id].name);
+            index = id;
+            audio.src = mediaPath + tracks[id].file + extension;
+        },
+        playTrack = function (id) {
+            loadTrack(id);
+            audio.play();
+        };
+        extension = audio.canPlayType('audio/mpeg') ? '.mp3' : audio.canPlayType('audio/ogg') ? '.ogg' : '';
+        loadTrack(index);
+    }
+});
