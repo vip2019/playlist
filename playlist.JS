@@ -316,34 +316,7 @@ val.title +" - " +val.author +"</a></li> ");
     //   });
 
     //console.log(items[0]);
-  }
-
-  players[0].on("ready", function(event) {
-    //$(".plyr-playlist .pls-playing").find("a").one().trigger("click");
-    console.log("Ready.....................................................");
-    players[0].play();
-    
-    
-    if(addbuttons){
-      
-      $(".plyr-playlist .pls-playing").find("a").trigger("click");
-      
-      $('<button type="button" class="plyr-prev"><i class="fa fa-step-backward fa-lg"></i></button>').insertBefore('.plyr__controls [data-plyr="play"]');
-
-      $('<button type="button" class="plyr-next"><i class="fa fa-step-forward fa-lg"></i></button>').insertAfter('.plyr__controls [data-plyr="pause"]');
-      
-      addbuttons = false ;
-    }
-    
-  }).on("ended", function(event) {
-    var $next = $(".plyr-playlist .pls-playing")
-      .next()
-      .find("a")
-      .trigger("click");
-    //$next.parent().addClass("pls-playing");
-  });
-
-    // hack, play the first video in the playlist
+     // hack, play the first video in the playlist
     //$(".plyr-playlist .pls-playing").find("a").trigger("click");
     //$(target).find("pls-playing a").trigger("click");
     // setTimeout(function(){ 
