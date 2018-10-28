@@ -11,19 +11,19 @@ b.setAttribute('data-platform', navigator.platform );
 
 // HTML5 audio player + playlist controls...
 // Inspiration: http://jonhall.info/how_to/create_a_playlist_for_html5_audio
-// Mythium Archive: https://archive.org/download/jam3_34/jam3_34_archive.torrent/
+// Mythium Archive: https://archive.org/details/jam3_34/
 jQuery(function ($) {
     var supportsAudio = !! document.createElement('audio').canPlayType;
     if (supportsAudio) {
         var index = 0,
             playing = false;
-        mediaPath = 'https://archive.org/download/jam3_34',
+        mediaPath = 'https://archive.org/download/mythium/',
         extension = '',
         tracks = [{
             "track": 1,
             "name": "All This Is -- Joe L.'s Studio",
             "length": "02:46",
-            "file": "03 Do Sol vos nasce A Luz"
+            "file": "JLS_ATI"
         }, {
             "track": 2,
             "name": "The Forsaken -- Broadwing Studio (Final Mix)",
