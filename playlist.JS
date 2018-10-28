@@ -1,127 +1,232 @@
-// Load Youtube IFrame Player API code asynchronously. This boat is going nowhere without it.
-var tag = document.createElement('script'); //Add a script tag
-tag.src = "https://www.youtube.com/iframe_api"; //Set the SRC to get the API
-var firstScriptTag = document.getElementsByTagName('script')[0]; //Find the first script tag in the html
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag); //Put this script tag before the first one
+// HTML5 audio player + playlist controls
+var jsPlayer = document.querySelector('.player-wrap');
+if (jsPlayer) {
+	jsPlayer = {
+		wrap: jsPlayer,
+		player: (jsPlayer.querySelector('audio') || { play: function(){}, pause: function(){} }),
+		play: (jsPlayer.querySelector('.play') || {}),
+		pause: (jsPlayer.querySelector('.pause') || {}),
+		seek: (jsPlayer.querySelector('.seek') || {}),
+		prev: (jsPlayer.querySelector('.prev') || {}),
+		next: (jsPlayer.querySelector('.next') || {}),
+		button: (jsPlayer.querySelector('.button') || { style: {} }),
+		wrapList: (document.querySelector('.playlist-wrap') || {}),
+		action: (jsPlayer.querySelector('.action') || {}),
+		title: (jsPlayer.querySelector('.title') || {}),
+		current: (jsPlayer.querySelector('.current') || {}),
+		duration: (jsPlayer.querySelector('.duration') || {}),
+		trackCount: 0,
+    seeking: null,
+		playing: false,
+		tracks: [],
+		track: [],
+		idx: 0
+	};
 
-var player; //The Youtube API player
-var ypt_player = document.getElementById('player');
-var playlistID = ypt_player.getAttribute('data-pl');
-var ypt_thumbs = document.getElementById('ypt_thumbs');
-var nowPlaying = "ypt-now-playing"; //For marking the current thumb
-var nowPlayingClass = "." + nowPlaying;
-var ypt_index = 0; //Playlists begin at the first video by default
-
-function getPlaylistData(playlistID, video_list, page_token) { //Makes a single request to Youtube Data API
-  var apiKey = 'AIzaSyArQNfmJDkjxP_ZyZIocbyuDeyTanf4Rl8';
-  var theUrl =
-  'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet' +
-  '&maxResults='+ 50 + //Can be anything from 1-50
-  '&playlistId=' + playlistID +
-  '&key=' + apiKey
-  ;
-  if(page_token){ theUrl +=('&pageToken=' + page_token );} //If there is page token, start there
-  var xmlHttp = null;
-  xmlHttp = new XMLHttpRequest();
-  xmlHttp.open( "GET", theUrl, true);
-  xmlHttp.send( null );
-  xmlHttp.onload = function (e) { //when the request comes back
-    buildJSON(xmlHttp.responseText, video_list, playlistID); //send the data to buildJSON
-  };
+	jsPlayer.playClicked = function jsPlayerPlayClicked(){
+		jsPlayer.button.style.visibility = 'hidden';
+		jsPlayer.pause.style.display = 'block';
+		jsPlayer.play.style.display = 'none';
+		jsPlayer.playing = true;
+		jsPlayer.action.innerHTML = 'Now Playing&hellip;';
+		jsPlayer.player.play();
+		jsPlayer.updateSeek();
+	};
+	jsPlayer.pauseClicked = function jsPlayerPauseClicked(){
+		jsPlayer.play.style.display = 'block';
+		jsPlayer.pause.style.display = 'none';
+		clearTimeout(jsPlayer.seeking);
+		jsPlayer.playing = false;
+		jsPlayer.action.innerHTML = 'Paused&hellip;';
+		jsPlayer.player.pause();
+	};
+	jsPlayer.loadPlaylist = function jaPlayerLoadPlaylist(){
+		jsPlayer.playlist = jsPlayer.wrapList? jsPlayer.wrapList.querySelectorAll('ol > li') : [];
+		var len = jsPlayer.playlist.length,
+			tmp, i;
+		for (i = 0; i < len; i++) {
+			if (!jsPlayer.playlist[i].dataset) {
+				jsPlayer.playlist[i].dataset = {};
+			}
+			tmp = jsPlayer.playlist[i].querySelector('a');
+			if (tmp && !jsPlayer.playlist[i].dataset.idx) {
+				jsPlayer.playlist[i].dataset.idx = i + 1;
+				jsPlayer.trackCount++;
+				jsPlayer.tracks.push({
+					"file": tmp.href,
+					"name": (tmp.textContent || tmp.innerText).replace(/^\s+|\s+$/g, ''),
+					"track": i + 1
+				});
+			}
+		}
+	};
+	jsPlayer.loadTrack = function jsPlayerLoadTrack(idx){
+		var len = jsPlayer.playlist.length,
+			i;
+		for (i=0; i < len; i++) {
+			if (jsPlayer.playlist[i].classList) {
+				if (i === idx) {
+					jsPlayer.playlist[i].classList.add('sel');
+				} else {
+					jsPlayer.playlist[i].classList.remove('sel');
+				}
+			}
+		}
+		jsPlayer.title.innerHTML = jsPlayer.tracks[idx].name;
+		jsPlayer.player.src = jsPlayer.tracks[idx].file + '.mp3';
+	};
+	jsPlayer.playTrack = function jsPlayerPlayTrack(idx){
+		jsPlayer.loadTrack(idx);
+		jsPlayer.playing = true;
+		jsPlayer.playClicked();
+	};
+	jsPlayer.init = function jsPlayerInit(){
+		var track = (jsPlayer.wrap && jsPlayer.wrap.dataset && jsPlayer.wrap.dataset.url)? jsPlayer.wrap : null,
+			tmp, i;
+		if (!!document.createElement('audio').canPlayType('audio/mpeg')) {
+			if (jsPlayer.wrapList && jsPlayer.wrapList.querySelectorAll('ol > li').length > 0) {
+				jsPlayer.loadPlaylist();
+			} else if (track) {
+				jsPlayer.tracks = [{
+					"file": track.dataset.url,
+					"name": (track.dataset.title || ''),
+					"track": 1
+				}];
+			}
+			if (jsPlayer.tracks.length > 0) {
+				if (jsPlayer.player) {
+					jsPlayer.player.addEventListener('ended', function playerEnded(){
+						if (jsPlayer.idx + 1 < jsPlayer.trackCount) {
+							jsPlayer.idx++;
+							jsPlayer.playTrack(jsPlayer.idx);
+						} else {
+							jsPlayer.action.innerHTML = 'Paused&hellip;';
+							jsPlayer.player.pause();
+							jsPlayer.idx = 0;
+							jsPlayer.loadTrack(jsPlayer.idx);
+						}
+					}, true);
+					jsPlayer.player.addEventListener('loadeddata', function playerLoadeddata(){
+						jsPlayer.setDuration();
+					}, true);
+				}
+				if (jsPlayer.play) {
+					jsPlayer.play.addEventListener('click', jsPlayer.playClicked, true);
+				}
+				if (jsPlayer.pause) {
+					jsPlayer.pause.addEventListener('click', jsPlayer.pauseClicked, true);
+				}
+				if (jsPlayer.button) {
+					jsPlayer.button.addEventListener('click', function buttonClicked(event){
+						event.preventDefault();
+						jsPlayer.playClicked();
+					}, true);
+				}
+				if (jsPlayer.prev) {
+					jsPlayer.prev.addEventListener('click', function prevClicked(event){
+						event.preventDefault();
+						if (jsPlayer.idx - 1 > -1) {
+							jsPlayer.idx--;
+							jsPlayer.loadTrack(jsPlayer.idx);
+							if (jsPlayer.playing) {
+								jsPlayer.action.innerHTML = 'Now Playing&hellip;';
+								jsPlayer.player.play();
+							}
+						} else {
+							jsPlayer.action.innerHTML = 'Paused&hellip;';
+							jsPlayer.playing = false;
+							jsPlayer.player.pause();
+							jsPlayer.idx = 0;
+							jsPlayer.loadTrack(jsPlayer.idx);
+						}
+					}, true);
+				}
+				if (jsPlayer.next) {
+					jsPlayer.next.addEventListener('click', function nextClicked(event){
+						event.preventDefault();
+						if (jsPlayer.idx + 1 < jsPlayer.trackCount) {
+							jsPlayer.idx++;
+							jsPlayer.loadTrack(jsPlayer.idx);
+							if (jsPlayer.playing) {
+								jsPlayer.action.innerHTML = 'Now Playing&hellip;';
+								jsPlayer.player.play();
+							}
+						} else {
+							jsPlayer.action.innerHTML = 'Paused&hellip;';
+							jsPlayer.playing = false;
+							jsPlayer.player.pause();
+							jsPlayer.idx = 0;
+							jsPlayer.loadTrack(jsPlayer.idx);
+						}
+					}, true);
+				}
+				if (jsPlayer.seek) {
+					jsPlayer.seek.addEventListener('mousedown', function seekClicked(){
+						clearTimeout(jsPlayer.seeking);
+						jsPlayer.action.innerHTML = 'Paused&hellip;';
+						jsPlayer.player.pause();
+					}, true);
+					jsPlayer.seek.addEventListener('mouseup', function seekReleased(){
+						jsPlayer.player.currentTime = jsPlayer.seek.value * jsPlayer.player.duration / 100;
+						jsPlayer.updateSeek();
+						if (jsPlayer.playing) {
+							jsPlayer.action.innerHTML = 'Now Playing&hellip;';
+							jsPlayer.player.play();
+						}
+					}, true);
+				}
+				if (jsPlayer.wrapList) {
+					jsPlayer.wrapList.addEventListener('click', function listClicked(event){
+						var parent = event.target.parentNode;
+						if (parent.parentNode.tagName.toLowerCase() === 'ol') {
+							event.preventDefault();
+							var len = jsPlayer.playlist.length,
+							i;
+							for (i = 0; i < len; i++) {
+								if (parent.dataset.idx == i + 1) {
+									jsPlayer.idx = i;
+									jsPlayer.playTrack(jsPlayer.idx);
+									i = len;
+								}
+							}
+						}
+					}, true);
+				}
+				jsPlayer.setDuration = function setDuration() {
+					jsPlayer.duration.innerHTML = jsPlayer.formatTime(jsPlayer.player.duration);
+					jsPlayer.current.innerHTML = jsPlayer.formatTime(jsPlayer.player.currentTime);
+					jsPlayer.seek.value = jsPlayer.player.currentTime / jsPlayer.player.duration;
+				};
+				jsPlayer.updateSeek = function updateSeek() {
+					jsPlayer.seek.value = 100 * jsPlayer.player.currentTime / jsPlayer.player.duration;
+					jsPlayer.current.innerHTML = jsPlayer.formatTime(jsPlayer.player.currentTime);
+					if (jsPlayer.playing) {
+						jsPlayer.seeking = setTimeout(jsPlayer.updateSeek, 500);
+					}
+				};
+				jsPlayer.formatTime = function formatTime(val) {
+					var h = 0, m = 0, s;
+					val = parseInt(val, 10);
+					if (val > 60 * 60) {
+						h = parseInt(val / (60 * 60), 10);
+						val -= h * 60 * 60;
+					}
+					if (val > 60) {
+						m = parseInt(val / 60, 10);
+						val -= m * 60;
+					}
+					s = val;
+					val = (h > 0)? h + ':' : '';
+					val += (m > 0)? ((m < 10 && h > 0)? '0' : '') + m + ':' : '0:';
+					val += ((s < 10)? '0' : '') + s;
+					return val;
+				};
+			}
+		}
+		if (jsPlayer.tracks.length > 0) {
+			jsPlayer.wrap.className += ' enabled';
+			jsPlayer.loadTrack(jsPlayer.idx);
+		}
+	};
+	jsPlayer.init();
 }
-
-function buildJSON(response, list, playlistID){ //Takes the text response and adds it to any existing JSON data
-  var results = JSON.parse(response); //Parse it
-  if(!list){ list = []; } //If there is no list to add to, make one
-  list.push.apply(list,results.items); //Add JSON data to the list
-  if(results.nextPageToken){ //If the results included a page token
-    getPlaylistData(playlistID, list, results.nextPageToken); //Create another data API request including the current list and page token
-  } else { //If there is not a next-page token
-    buildHTML(list); //Send the JSON data to buildHTML
-  }
-}
-
-function buildHTML(data){ //Turns JSON data into HTML elements
-  var list_data = ''; //A string container
-  for(i = 0; i < data.length; i++){ //Do this to each item in the JSON list
-    var item = data[i].snippet; //Each Youtube playlist item snippet
-    if(!item.thumbnails){continue;} //private videos do no reveal thumbs, so skip them
-    list_data += '<li data-ypt-index="'+ i +'"><p>' + item.title + '</p><span><img alt="'+ item.title +'" src="'+ item.thumbnails.medium.url +'"/></span></li>'; //create an element and add it to the list
-  }
-  ypt_thumbs.innerHTML = list_data; //After the for loop, insert that list of links into the html
-}
-
-function yptThumbHeight(){
-  ypt_thumbs.style.height = document.getElementById('player').clientHeight + 'px'; //change the height of the thumb list
-  //breaks if ypt_player.clientHeight + 'px';
-}
-
-function onPlayerReady(event) { //Once the player is ready...
-  yptThumbHeight(); //Set the thumb containter height
-}
-
-getPlaylistData(playlistID);
-
-//Once the Youtube Iframe API is ready...
-window.onYouTubeIframeAPIReady = function() { // Creates an <iframe> (and YouTube player) after the API code downloads. must be globally available
-  player = new YT.Player('player', {
-    height: '360',
-    width: '640',
-    playerVars:
-    {
-      listType:'playlist',
-      list: playlistID
-    },
-    events: {
-      'onReady': onPlayerReady,
-      'onStateChange': onPlayerStateChange
-    }
-  });
-
-  // When the player does something...
-  function onPlayerStateChange(event) {
-
-    //Let's check on what video is playing
-    var currentIndex = player.getPlaylistIndex();
-    var the_thumbs = ypt_thumbs.getElementsByTagName('li');
-    var currentThumb = the_thumbs[currentIndex];
-
-    if (event.data == YT.PlayerState.PLAYING) { //A video is playing
-
-      for (var i = 0; i < the_thumbs.length; i++) { //Loop through the thumbs
-        the_thumbs[i].className = ""; //Remove nowplaying from each thumb
-      }
-
-      currentThumb.className = nowPlaying; //this will also erase any other class belonging to the li
-      //need to do a match looking for now playing
-    }
-
-    //if a video has finished, and the current index is the last video, and that thumb already has the nowplaying class
-    if (event.data == YT.PlayerState.ENDED && currentIndex == the_thumbs.length - 1 && the_thumbs[currentIndex].className == nowPlaying){
-      jQuery.event.trigger('playlistEnd'); //Trigger a global event
-    }
-  } //function onPlayerStateChange(event)
-
-  //When the user changes the window size...
-  window.addEventListener('resize', function(event){
-    yptThumbHeight(); //change the height of the thumblist
-  });
-
-  //When the user clicks an element with a playlist index...
-  jQuery(document).on('click','[data-ypt-index]:not(".ypt-now-playing")',function(e){ //click on a thumb that is not currently playing
-    ypt_index = Number(jQuery(this).attr('data-ypt-index')); //Get the ypt_index of the clicked item
-    if(navigator.userAgent.match(/(iPad|iPhone|iPod)/g)){ //if IOS
-      player.cuePlaylist({ //cue is required for IOS 7
-        listType: 'playlist',
-        list: playlistID,
-        index: ypt_index,
-        suggestedQuality: 'hd720' //quality is required for cue to work, for now
-        // https://code.google.com/p/gdata-issues/issues/detail?id=5411
-      }); //player.cuePlaylist
-    } else { //yay it's not IOS!
-    player.playVideoAt(ypt_index); //Play the new video, does not work for IOS 7
-  }
-  jQuery(nowPlayingClass).removeClass(nowPlaying); //Remove "now playing" from the thumb that is no longer playing
-  //When the new video starts playing, its thumb will get the now playing class
-}); //jQuery(document).on('click','#ypt_thumbs...
-};
