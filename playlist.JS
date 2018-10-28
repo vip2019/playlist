@@ -1,19 +1,45 @@
-var video_player = document.getElementById("video_player"),
-links = video_player.getElementsByTagName('a');
-for (var i=0; i<links.length; i++) {
-	links[i].onclick = handler;
-}
+// ensure that DOM is ready
+window.onload = function () {
 
-function handler(e) {
-	e.preventDefault();
-	videotarget = this.getAttribute("href");
-	filename = videotarget.substr(0, videotarget.lastIndexOf('.')) || videotarget;
-	video = document.querySelector("#video_player video");
-	video.removeAttribute("controls");
-	video.removeAttribute("poster");
-	source = document.querySelectorAll("#video_player video source");
-	source[0].src = filename + ".mp4";
-	source[1].src = filename + ".webm";
-	video.load();
-	video.play();    
-}
+  var container = document.getElementById("grid"),
+
+  getVideoName = function (i) {
+    /*
+      we do not have 12 videos available
+      so repeat videos named night1 thru night6
+      fill grid with 6 videos by clamping index count between 0 and 5
+    */
+    return "night" + (i % 6 + 1);
+  },
+
+  getPlaylist = function () {
+    var playlist = [], i;
+
+    for (i = 0; i < 12; i += 1) {
+      playlist.push({
+        sources: [
+          { type: "application/x-mpegurl",
+            src:  "//edge.flowplayer.org/" + getVideoName(i) + ".m3u8" },
+          { type: "video/mp4",
+            src:  "//edge.flowplayer.org/" + getVideoName(i) + ".mp4" },
+          { type: "video/flash",
+            src:  "mp4:" + getVideoName(i) }
+        ]
+      });
+    }
+
+    return playlist;
+  };
+
+
+  // install the player
+  flowplayer(container, {
+    playlist: getPlaylist(),
+    customPlaylist: true,
+    qualities: ["216p", "360p", "720p", "1080p"],
+    defaultQuality: "360p",
+    rtmp: "rtmp://s3b78u0kbtx79q.cloudfront.net/cfx/st",
+    ratio: 9/16
+  });
+
+};
